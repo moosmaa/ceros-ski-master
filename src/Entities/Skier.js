@@ -62,20 +62,30 @@ export class Skier extends Entity {
     }
 
     turnLeft() {
-        if(this.direction === Constants.SKIER_DIRECTIONS.LEFT) {
-            this.moveSkierLeft();
-        }
-        else {
-            this.setDirection(this.direction - 1);
+        switch(this.direction) {
+            case Constants.SKIER_DIRECTIONS.LEFT:
+                this.moveSkierLeft();
+                break;
+            case Constants.SKIER_DIRECTIONS.CRASH:
+                this.setDirection(Constants.SKIER_DIRECTIONS.LEFT);
+                this.moveSkierLeft();
+                break;
+            default:
+                this.setDirection(this.direction - 1);
         }
     }
 
     turnRight() {
-        if(this.direction === Constants.SKIER_DIRECTIONS.RIGHT) {
-            this.moveSkierRight();
-        }
-        else {
-            this.setDirection(this.direction + 1);
+        switch(this.direction) {
+            case Constants.SKIER_DIRECTIONS.RIGHT:
+                this.moveSkierRight();
+                break;
+            case Constants.SKIER_DIRECTIONS.CRASH:
+                this.setDirection(Constants.SKIER_DIRECTIONS.RIGHT);
+                this.moveSkierRight();
+                break;
+            default:
+                this.setDirection(this.direction + 1);
         }
     }
 
