@@ -7,6 +7,10 @@ export class Skier extends Entity {
 
     direction = Constants.SKIER_DIRECTIONS.DOWN;
     speed = Constants.SKIER_STARTING_SPEED;
+    diagonalSpeed = Constants.SKIER_DIAGONAL_SPEED;
+    isJumping = false;
+    preJumpDirection = this.direction;
+    preJumpY = this.y;
 
     constructor(x, y) {
         super(x, y);
@@ -22,7 +26,9 @@ export class Skier extends Entity {
     }
 
     move() {
-        switch(this.direction) {
+        const directionMoving = this.isJumping ? this.preJumpDirection : this.direction;
+
+        switch(directionMoving) {
             case Constants.SKIER_DIRECTIONS.LEFT_DOWN:
                 this.moveSkierLeftDown();
                 break;
@@ -33,32 +39,43 @@ export class Skier extends Entity {
                 this.moveSkierRightDown();
                 break;
         }
+
+
     }
 
     moveSkierLeft() {
-        this.x -= Constants.SKIER_STARTING_SPEED;
+        this.x -= this.speed;
     }
 
     moveSkierLeftDown() {
-        this.x -= this.speed / Constants.SKIER_DIAGONAL_SPEED_REDUCER;
-        this.y += this.speed / Constants.SKIER_DIAGONAL_SPEED_REDUCER;
+        this.x -= this.diagonalSpeed;
+        this.y += this.diagonalSpeed;
+        if(this.isJumping) {
+            this.progressJump(this.diagonalSpeed);
+        }
     }
 
     moveSkierDown() {
         this.y += this.speed;
+        if(this.isJumping) {
+            this.progressJump(this.speed);
+        }
     }
 
     moveSkierRightDown() {
-        this.x += this.speed / Constants.SKIER_DIAGONAL_SPEED_REDUCER;
-        this.y += this.speed / Constants.SKIER_DIAGONAL_SPEED_REDUCER;
+        this.x += this.diagonalSpeed;
+        this.y += this.diagonalSpeed;
+        if(this.isJumping) {
+            this.progressJump(this.diagonalSpeed);
+        }
     }
 
     moveSkierRight() {
-        this.x += Constants.SKIER_STARTING_SPEED;
+        this.x += this.speed;
     }
 
     moveSkierUp() {
-        this.y -= Constants.SKIER_STARTING_SPEED;
+        this.y -= this.speed;
     }
 
     turnLeft() {
@@ -69,6 +86,9 @@ export class Skier extends Entity {
             case Constants.SKIER_DIRECTIONS.CRASH:
                 this.setDirection(Constants.SKIER_DIRECTIONS.LEFT);
                 this.moveSkierLeft();
+                break;
+            case Constants.SKIER_DIRECTIONS.JUMP1: // to-do, add all jump cases
+                // Do nothing. Skier cannot turn midair.
                 break;
             default:
                 this.setDirection(this.direction - 1);
@@ -84,6 +104,9 @@ export class Skier extends Entity {
                 this.setDirection(Constants.SKIER_DIRECTIONS.RIGHT);
                 this.moveSkierRight();
                 break;
+            case Constants.SKIER_DIRECTIONS.JUMP1: // to-do: add all jump cases
+                // Do nothing. Skier cannot turn midair.
+                break;
             default:
                 this.setDirection(this.direction + 1);
         }
@@ -96,8 +119,37 @@ export class Skier extends Entity {
     }
 
     turnDown() {
+        // to-do: cannot turn during jump
         this.setDirection(Constants.SKIER_DIRECTIONS.DOWN);
     }
+
+    initJump() {
+        // skier can only jump if moving in a downward direction
+        if(this.direction === Constants.SKIER_DIRECTIONS.LEFT_DOWN || this.direction === Constants.SKIER_DIRECTIONS.RIGHT_DOWN || this.direction === Constants.SKIER_DIRECTIONS.DOWN){
+            this.preJumpDirection = this.direction;
+            this.preJumpY = this.y;
+            this.isJumping = true;
+            this.setDirection(Constants.SKIER_DIRECTIONS.JUMP1);
+        }
+    }
+
+    progressJump(downwardSpeed) {
+        let jumpInterval = downwardSpeed*5;
+        // if skier is not at the end of the jump
+        if(this.direction < Constants.SKIER_DIRECTIONS.JUMP5) {
+            if((this.y - this.preJumpY) % jumpInterval === 0){
+                this.setDirection(this.direction + 1);
+            }
+        // else, complete the jump
+        } else {
+            if((this.y - this.preJumpY) % jumpInterval === 0) {
+                this.isJumping = false;
+                this.setDirection(this.preJumpDirection);
+            }
+        }
+    }
+
+
 
     checkIfSkierHitObstacle(obstacleManager, assetManager) {
         const asset = assetManager.getAsset(this.assetName);
@@ -109,19 +161,26 @@ export class Skier extends Entity {
         );
 
         const collision = obstacleManager.getObstacles().find((obstacle) => {
-            const obstacleAsset = assetManager.getAsset(obstacle.getAssetName());
-            const obstaclePosition = obstacle.getPosition();
-            const obstacleBounds = new Rect(
-                obstaclePosition.x - obstacleAsset.width / 2,
-                obstaclePosition.y - obstacleAsset.height / 2,
-                obstaclePosition.x + obstacleAsset.width / 2,
-                obstaclePosition.y
-            );
+            const obstacleAssetName = obstacle.getAssetName();
+            const obstacleAsset = assetManager.getAsset(obstacleAssetName);
+            if(this.isJumping && Constants.OBSTACLES_SKIER_CAN_JUMP.indexOf(obstacleAssetName) > -1) {
+                return false;
+            } else {
+                const obstaclePosition = obstacle.getPosition();
+                const obstacleBounds = new Rect(
+                    obstaclePosition.x - obstacleAsset.width / 2,
+                    obstaclePosition.y - obstacleAsset.height / 2,
+                    obstaclePosition.x + obstacleAsset.width / 2,
+                    obstaclePosition.y
+                );
 
-            return intersectTwoRects(skierBounds, obstacleBounds);
+                return intersectTwoRects(skierBounds, obstacleBounds);
+            }
+
         });
 
         if(collision) {
+            this.isJumping = false;
             this.setDirection(Constants.SKIER_DIRECTIONS.CRASH);
         }
     };
