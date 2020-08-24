@@ -2,8 +2,10 @@ import * as Constants from "../Constants";
 import { AssetManager } from "./AssetManager";
 import { Canvas } from './Canvas';
 import { Skier } from "../Entities/Skier";
+// import { Rhino } from "../Entities/Rhino/Rhino";
 import { ObstacleManager } from "../Entities/Obstacles/ObstacleManager";
 import { Rect } from './Utils';
+import {Rhino} from "../Entities/Rhino/Rhino";
 
 export class Game {
     gameWindow = null;
@@ -12,6 +14,9 @@ export class Game {
         this.assetManager = new AssetManager();
         this.canvas = new Canvas(Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
         this.skier = new Skier(0, 0);
+        this.rhinoTimerStarted = false;
+        this.rhinoChasing = false;
+        this.rhinoFoodCaught = false;
         this.obstacleManager = new ObstacleManager();
 
         document.addEventListener('keydown', this.handleKeyDown.bind(this));
@@ -32,10 +37,20 @@ export class Game {
         this.drawGameWindow();
 
         requestAnimationFrame(this.run.bind(this));
+
+        if(!this.rhinoTimerStarted) {
+            this.startRhinoTimer();
+        }
+
     }
 
     updateGameWindow() {
-        this.skier.move();
+        if(!this.rhinoFoodCaught){
+            this.skier.move();
+            if(this.rhinoChasing)
+                this.rhinoFoodCaught = this.rhino.chase(this.skier);
+        }
+
 
         const previousGameWindow = this.gameWindow;
         this.calculateGameWindow();
@@ -49,7 +64,10 @@ export class Game {
         this.canvas.setDrawOffset(this.gameWindow.left, this.gameWindow.top);
 
         this.skier.draw(this.canvas, this.assetManager);
+        if(this.rhinoChasing)
+            this.rhino.draw(this.canvas, this.assetManager);
         this.obstacleManager.drawObstacles(this.canvas, this.assetManager);
+
     }
 
     calculateGameWindow() {
@@ -58,6 +76,22 @@ export class Game {
         const top = skierPosition.y - (Constants.GAME_HEIGHT / 2);
 
         this.gameWindow = new Rect(left, top, left + Constants.GAME_WIDTH, top + Constants.GAME_HEIGHT);
+    }
+
+    startRhinoTimer() {
+        if(!this.rhinoTimerStarted){
+            this.rhinoTimerStarted = true;
+            return setTimeout(() => {
+                this.startRhinoChase();
+            }, 5000);
+        }
+    }
+
+    startRhinoChase() {
+        this.rhino = new Rhino(this.gameWindow.right - 50, this.gameWindow.top + 50);
+        this.rhino.draw(this.canvas, this.assetManager);
+        this.rhinoFoodCaught = this.rhino.chase(this.skier);
+        this.rhinoChasing = true;
     }
 
     handleKeyDown(event) {
