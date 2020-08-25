@@ -98,3 +98,23 @@ how creative candidates get with this.
 * Write more unit tests for your code
 
 We are looking forward to see what you come up with!
+
+## My Comments
+
+### What was done
+
+* **Fix blizzard bug:** I updated the turnLeft and turnRight functions to take into account the skier's current direction (left/crashed/right). Later on, I added the logic for what should be done if the skier is mid-jump. I decided it didn't make sense to turn mid-jump, so the keypress is ignored.
+
+* **Write unit tests:** I wrote unit tests for the turnLeft and turnRight functions. I updated the unit tests when the jump branch was added to achieve 100% coverage for those two functions.
+
+* **Add skier jump functionality:** I gave the skier the ability to jump when the spacebar is pressed or when he hits a ramp. He can jump over rocks, but not trees. He can only jump when he is moving in the downward direction (rightdown/leftdown/down). He does a fancy flip. I didn't think it made sense to classify jumping as a direction, so I altered the code to allow me to keep the existing direction and just update the asset directly.
+
+* **Add rhino:** I added a rhino that appears and chases down the skier after a set amount of time. The running is animated. When the rhino's position is the same as the skier's position, the rhino eats the skier.
+
+
+### What wasn't done
+* **Bonuses** I'm in a time crunch and unfortunatley didn't get a chance to play around with adding fun features.  
+
+* **Obstacles** After I added the ramp to the obstacles, the word "obstacle" didn't seem as appropriate anymore. It might be a good idea to come up with a different word to describe the non-breathing assets in the game. 
+
+* **RhinoManager** There's a lot of rhino management going on in the Game class. It should probably be moved to a separate RhinoManager class to increase readability.
