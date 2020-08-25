@@ -9,6 +9,25 @@ describe('Skier', () => {
         skier = new Skier(0,0);
     });
 
+    describe('that has isJumping', () => {
+
+        beforeEach(() => {
+            skier.setDirection(Constants.SKIER_DIRECTIONS.LEFT_DOWN)
+            skier.isJumping = true;
+        });
+
+        test('should NOT change direction on turnLeft',() => {
+            skier.turnLeft();
+            expect(skier.direction).toBe(Constants.SKIER_DIRECTIONS.LEFT_DOWN);
+        });
+
+        test('should NOT change direction on turnRight',() => {
+            skier.turnRight();
+            expect(skier.direction).toBe(Constants.SKIER_DIRECTIONS.LEFT_DOWN);
+        });
+
+    });
+
     describe('that has CRASHed', () => {
 
         beforeEach(() => {
