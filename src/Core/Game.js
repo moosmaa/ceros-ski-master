@@ -10,7 +10,7 @@ export class Game {
     gameWindow = null;
     rhinoTimerStarted = false;
     rhinoChasing = false;
-    rhinoFoodCaught = false;
+    skierCaught = false;
     rhinoEating = false;
 
     constructor() {
@@ -45,26 +45,35 @@ export class Game {
     }
 
     updateGameWindow() {
-        if ( !this.rhinoFoodCaught ){
+        // if skier isn't caught, move skier
+        // if rhino is currently chasing, move rhino
+        if ( !this.skierCaught ){
+
             this.skier.move();
+
             if(this.rhinoChasing){
-                this.rhinoFoodCaught = this.rhino.chase(this.skier);
-                this.rhinoChasing = !this.rhinoFoodCaught;
+                this.skierCaught = this.rhino.chase(this.skier);
+                this.rhinoChasing = !this.skierCaught;
             }
         }
 
         const previousGameWindow = this.gameWindow;
         this.calculateGameWindow();
 
-        this.obstacleManager.placeNewObstacle(this.gameWindow, previousGameWindow);
+        if(this.gameWindow) {
+            this.obstacleManager.placeNewObstacle(this.gameWindow, previousGameWindow);
 
-        this.skier.checkIfSkierHitObstacle(this.obstacleManager, this.assetManager);
+            this.skier.checkIfSkierHitObstacle(this.obstacleManager, this.assetManager);
+        }
     }
 
     drawGameWindow() {
         this.canvas.setDrawOffset(this.gameWindow.left, this.gameWindow.top);
 
-        if (!this.rhinoFoodCaught) {
+        // if skier isn't caught, draw skier
+        // if skier is caught, draw rhino eating skier
+        // if rhino is chasing, draw rhino chasing
+        if (!this.skierCaught) {
             this.skier.draw(this.canvas, this.assetManager);
         } else {
             if(!this.rhinoEating) {
@@ -95,14 +104,14 @@ export class Game {
             this.rhinoTimerStarted = true;
             return setTimeout(() => {
                 this.startRhinoChase();
-            }, 10000);
+            }, Constants.SKIER_HEAD_START);
         }
     }
 
     startRhinoChase() {
         this.rhino = new Rhino(this.gameWindow.right - 50, this.gameWindow.top + 50);
         this.rhino.draw(this.canvas, this.assetManager);
-        this.rhinoFoodCaught = this.rhino.chase(this.skier);
+        this.skierCaught = this.rhino.chase(this.skier);
         this.rhinoChasing = true;
         this.rhino.animateRun();
     }

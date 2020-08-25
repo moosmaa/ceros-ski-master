@@ -1,15 +1,14 @@
 import * as Constants from "../Constants";
 import { Entity } from "./Entity";
-import { intersectTwoRects, Rect } from "../Core/Utils";
 
 export class Rhino extends Entity {
     assetName = Constants.RHINO_RUN[0];
     speed = Constants.RHINO_STARTING_SPEED;
     isEating = false;
-    eatProgression;
+    eatIterator;
     numEatingSteps = 5;
-    runT; // to-do: make these variables more intuitive
-    eatT;
+    runTimer;
+    eatTimer;
 
     constructor(x, y) {
         super(x, y);
@@ -20,40 +19,41 @@ export class Rhino extends Entity {
         this.assetName = assetName;
     }
 
-    chase(food) {
-        if(food.x > this.x)
-            this.x += Math.min(this.speed, food.x - this.x);
-        else if (food.x < this.x)
-            this.x -= Math.min(this.speed, this.x - food.x);
+    chase(skier) {
+        // close x distance between rhino and skier
+        if(skier.x > this.x)
+            this.x += Math.min(this.speed, skier.x - this.x);
+        else if (skier.x < this.x)
+            this.x -= Math.min(this.speed, this.x - skier.x);
+        // close y distance between rhino and skier
+        if(skier.y > this.y)
+            this.y += Math.min(this.speed, skier.y - this.y);
+        else if (skier.y < this.y)
+            this.y -= Math.min(this.speed, this.y - skier.y);
 
-        if(food.y > this.y)
-            this.y += Math.min(this.speed, food.y - this.y);
-        else if (food.y < this.y)
-            this.y -= Math.min(this.speed, this.y - food.y);
+        let skierCaught = this.checkIfSkierCaught(skier);
 
-        let foodCaught = this.checkIfFoodCaught(food);
-
-        if (foodCaught )
+        if (skierCaught )
             this.stopAnimateRun();
 
-        return this.checkIfFoodCaught(food);
+        return this.checkIfSkierCaught(skier);
     }
 
     animateRun() {
         let runProgression = 0;
         let rhino = this;
-        this.runT = setInterval( function () {
+        this.runTimer = setInterval( function () {
             runProgression = runProgression === 0 ? 1 : 0;
             rhino.updateAsset(Constants.RHINO_RUN[runProgression]);
         }, 200);
     }
 
     stopAnimateRun() {
-        clearInterval(this.runT);
+        clearInterval(this.runTimer);
     }
 
-    checkIfFoodCaught(food) {
-        if(food.x == this.x && food.y == this.y) {
+    checkIfSkierCaught(skier) {
+        if(skier.x == this.x && skier.y == this.y) {
             return true;
         } else {
             return false;
@@ -67,16 +67,16 @@ export class Rhino extends Entity {
 
     initEat() {
         this.isEating = true;
-        this.eatProgression = 0;
-        this.updateAsset(Constants.RHINO_EAT[this.eatProgression]);
+        this.eatIterator = 0;
+        this.updateAsset(Constants.RHINO_EAT[this.eatIterator]);
     }
 
     progressEat() {
         let rhino = this;
-        this.eatT = setTimeout( function(){
-            rhino.eatProgression ++;
-            if( rhino.eatProgression <= rhino.numEatingSteps ) {
-                rhino.updateAsset(Constants.RHINO_EAT[rhino.eatProgression])
+        this.eatTimer = setTimeout( function(){
+            rhino.eatIterator ++;
+            if( rhino.eatIterator <= rhino.numEatingSteps ) {
+                rhino.updateAsset(Constants.RHINO_EAT[rhino.eatIterator])
                 rhino.progressEat();
             }
         }, 500)
