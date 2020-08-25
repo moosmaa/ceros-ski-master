@@ -2,21 +2,20 @@ import * as Constants from "../Constants";
 import { AssetManager } from "./AssetManager";
 import { Canvas } from './Canvas';
 import { Skier } from "../Entities/Skier";
-// import { Rhino } from "../Entities/Rhino/Rhino";
+import { Rhino } from "../Entities/Rhino/Rhino";
 import { ObstacleManager } from "../Entities/Obstacles/ObstacleManager";
 import { Rect } from './Utils';
-import {Rhino} from "../Entities/Rhino/Rhino";
 
 export class Game {
     gameWindow = null;
+    rhinoTimerStarted = false;
+    rhinoChasing = false;
+    rhinoFoodCaught = false;
 
     constructor() {
         this.assetManager = new AssetManager();
         this.canvas = new Canvas(Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
         this.skier = new Skier(0, 0);
-        this.rhinoTimerStarted = false;
-        this.rhinoChasing = false;
-        this.rhinoFoodCaught = false;
         this.obstacleManager = new ObstacleManager();
 
         document.addEventListener('keydown', this.handleKeyDown.bind(this));
@@ -92,6 +91,7 @@ export class Game {
         this.rhino.draw(this.canvas, this.assetManager);
         this.rhinoFoodCaught = this.rhino.chase(this.skier);
         this.rhinoChasing = true;
+        this.rhino.animateRun();
     }
 
     handleKeyDown(event) {

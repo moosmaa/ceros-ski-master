@@ -3,16 +3,17 @@ import { Entity } from "../Entity";
 import { intersectTwoRects, Rect } from "../../Core/Utils";
 
 export class Rhino extends Entity {
-    assetName = Constants.RHINO_LEFT;
+    assetName = Constants.RHINO_RUN[0];
     speed = Constants.RHINO_STARTING_SPEED;
     diagonalSpeed = Constants.RHINO_DIAGONAL_SPEED;
     isChasing = false;
     foodCaught = false;
     isEating = false;
-    eatProgression = null;
+    eatProgression = 0;
 
     constructor(x, y) {
         super(x, y);
+
     }
 
     updateAsset(assetName) {
@@ -20,8 +21,6 @@ export class Rhino extends Entity {
     }
 
     chase(food) {
-        this.isChasing = true;
-
         if(food.x > this.x)
             this.x += Math.min(this.speed, food.x - this.x);
         else if (food.x < this.x)
@@ -33,6 +32,16 @@ export class Rhino extends Entity {
             this.y -= Math.min(this.speed, this.y - food.y);
 
         this.foodCaught = this.checkIfFoodCaught(food);
+        this.isChasing = !this.foodCaught;
+    }
+
+    animateRun() {
+        let runProgression = 0;
+        let rhino = this;
+        setInterval( function () {
+            runProgression = runProgression === 0 ? 1 : 0;
+            rhino.updateAsset(Constants.RHINO_RUN[runProgression]);
+        }, 200);
     }
 
     checkIfFoodCaught(food) {

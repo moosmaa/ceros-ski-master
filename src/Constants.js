@@ -19,8 +19,10 @@ export const TREE_CLUSTER = 'treeCluster';
 export const ROCK1 = 'rock1';
 export const ROCK2 = 'rock2';
 export const JUMP_RAMP = 'jumpRamp';
-export const RHINO_LEFT = 'rhinoLeft';
-export const RHINO_LEFT2 = 'rhinoLeft2';
+export const RHINO_RUN = [
+    'rhinoLeft',
+    'rhinoLeft2'
+    ]
 export const RHINO_EAT = [
     'rhinoLift',
     'rhinoLiftMouthOpen',
@@ -55,8 +57,8 @@ export const ASSETS = {
     [SKIER_JUMP[3]]: 'img/skier_jump_4.png',
     [SKIER_JUMP[4]]: 'img/skier_jump_5.png',
     [RHINO_DEFAULT]: 'img/rhino_default.png',
-    [RHINO_LEFT]: 'img/rhino_run_left.png',
-    [RHINO_LEFT2]: 'img/rhino_run_left_2.png',
+    [RHINO_RUN[0]]: 'img/rhino_run_left.png',
+    [RHINO_RUN[1]]: 'img/rhino_run_left_2.png',
     [RHINO_EAT[0]]: 'img/rhino_lift.png',
     [RHINO_EAT[1]]: 'img/rhino_lift_mouth_open.png',
     [RHINO_EAT[2]]: 'img/rhino_lift_eat_1.png',
