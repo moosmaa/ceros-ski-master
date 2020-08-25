@@ -42,7 +42,6 @@ export const OBSTACLES_SKIER_CAN_JUMP = [
 export const SKIER_STARTING_SPEED = 10;
 export const SKIER_DIAGONAL_SPEED = 7
 export const RHINO_STARTING_SPEED = 10;
-export const RHINO_DIAGONAL_SPEED = 7;
 
 export const ASSETS = {
     [SKIER_CRASH]: 'img/skier_crash.png',

@@ -11,6 +11,7 @@ export class Game {
     rhinoTimerStarted = false;
     rhinoChasing = false;
     rhinoFoodCaught = false;
+    rhinoEating = false;
 
     constructor() {
         this.assetManager = new AssetManager();
@@ -44,12 +45,13 @@ export class Game {
     }
 
     updateGameWindow() {
-        if(!this.rhinoFoodCaught){
+        if ( !this.rhinoFoodCaught ){
             this.skier.move();
-            if(this.rhinoChasing)
+            if(this.rhinoChasing){
                 this.rhinoFoodCaught = this.rhino.chase(this.skier);
+                this.rhinoChasing = !this.rhinoFoodCaught;
+            }
         }
-
 
         const previousGameWindow = this.gameWindow;
         this.calculateGameWindow();
@@ -62,9 +64,20 @@ export class Game {
     drawGameWindow() {
         this.canvas.setDrawOffset(this.gameWindow.left, this.gameWindow.top);
 
-        this.skier.draw(this.canvas, this.assetManager);
-        if(this.rhinoChasing)
+        if (!this.rhinoFoodCaught) {
+            this.skier.draw(this.canvas, this.assetManager);
+        } else {
+            if(!this.rhinoEating) {
+                this.rhino.eat();
+                this.rhinoEating = true;
+            }
             this.rhino.draw(this.canvas, this.assetManager);
+        }
+
+        if(this.rhinoChasing) {
+            this.rhino.draw(this.canvas, this.assetManager);
+        }
+
         this.obstacleManager.drawObstacles(this.canvas, this.assetManager);
 
     }

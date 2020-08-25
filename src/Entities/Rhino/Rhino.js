@@ -5,11 +5,11 @@ import { intersectTwoRects, Rect } from "../../Core/Utils";
 export class Rhino extends Entity {
     assetName = Constants.RHINO_RUN[0];
     speed = Constants.RHINO_STARTING_SPEED;
-    diagonalSpeed = Constants.RHINO_DIAGONAL_SPEED;
-    isChasing = false;
-    foodCaught = false;
     isEating = false;
-    eatProgression = 0;
+    eatProgression;
+    numEatingSteps = 5;
+    runT; // to-do: make these variables more intuitive
+    eatT;
 
     constructor(x, y) {
         super(x, y);
@@ -31,17 +31,25 @@ export class Rhino extends Entity {
         else if (food.y < this.y)
             this.y -= Math.min(this.speed, this.y - food.y);
 
-        this.foodCaught = this.checkIfFoodCaught(food);
-        this.isChasing = !this.foodCaught;
+        let foodCaught = this.checkIfFoodCaught(food);
+
+        if (foodCaught )
+            this.stopAnimateRun();
+
+        return this.checkIfFoodCaught(food);
     }
 
     animateRun() {
         let runProgression = 0;
         let rhino = this;
-        setInterval( function () {
+        this.runT = setInterval( function () {
             runProgression = runProgression === 0 ? 1 : 0;
             rhino.updateAsset(Constants.RHINO_RUN[runProgression]);
         }, 200);
+    }
+
+    stopAnimateRun() {
+        clearInterval(this.runT);
     }
 
     checkIfFoodCaught(food) {
@@ -52,28 +60,26 @@ export class Rhino extends Entity {
         }
     }
 
+    eat() {
+        this.initEat();
+        this.progressEat();
+    }
+
     initEat() {
         this.isEating = true;
         this.eatProgression = 0;
         this.updateAsset(Constants.RHINO_EAT[this.eatProgression]);
     }
 
-    // asyncEat(downwardSpeed) {
-    //     let jumpInterval = downwardSpeed*5;
-    //     // if skier is not at the end of the jump
-    //     if(this.jumpProgression < 4) {
-    //         if((this.y - this.preJumpY) % jumpInterval === 0){
-    //             this.jumpProgression += 1;
-    //             this.updateAsset(Constants.RHINO_JUMP[this.jumpProgression]);
-    //         }
-    //     // else, complete the jump
-    //     } else {
-    //         if((this.y - this.preJumpY) % jumpInterval === 0) {
-    //             this.isJumping = false;
-    //             this.updateAsset(Constants.RHINO_DIRECTION_ASSET[this.direction]);
-    //         }
-    //     }
-    // }
-
+    progressEat() {
+        let rhino = this;
+        this.eatT = setTimeout( function(){
+            rhino.eatProgression ++;
+            if( rhino.eatProgression <= rhino.numEatingSteps ) {
+                rhino.updateAsset(Constants.RHINO_EAT[rhino.eatProgression])
+                rhino.progressEat();
+            }
+        }, 500)
+    }
 
 }
