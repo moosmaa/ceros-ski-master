@@ -95,7 +95,7 @@ export class Game {
             this.rhinoTimerStarted = true;
             return setTimeout(() => {
                 this.startRhinoChase();
-            }, 5000);
+            }, 10000);
         }
     }
 
