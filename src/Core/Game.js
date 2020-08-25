@@ -2,7 +2,7 @@ import * as Constants from "../Constants";
 import { AssetManager } from "./AssetManager";
 import { Canvas } from './Canvas';
 import { Skier } from "../Entities/Skier";
-import { Rhino } from "../Entities/Rhino/Rhino";
+import { Rhino } from "../Entities/Rhino";
 import { ObstacleManager } from "../Entities/Obstacles/ObstacleManager";
 import { Rect } from './Utils';
 
